@@ -21,12 +21,12 @@ public class Enemy : Character {
 	// Update is called once per frame
 	void Update () {
 
-        Util.TILES[posX, posY].SetChar(gameObject);
-
         StatusCalculation();
+        SetPosition();
 
         if (Input.GetKeyDown(KeyCode.H))
         {
+            Dijkstra(Util.GRAPH, Util.GRAPH.Vertices.Find(v => v.Tile.Equals(Util.TILES[posX, posY])));
             StartCoroutine(MakeMove(SelectTarget().Tile));
         }
     }
@@ -34,9 +34,53 @@ public class Enemy : Character {
     Vertex<Tile> SelectTarget()
     {
         //If at least one player is within enemy's range,
-        //go for that one if only one player, otherwise 
+        //go for that one if only one, otherwise 
         //go for the player having least HP
+        List<GameObject> reachablePlayers = new List<GameObject>();
+        foreach(GameObject p in Util.PLAYERS)
+        {
+            foreach(Tile t in p.GetComponent<Player>().adjacentTiles)
+            {
+                if(dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == t)] <= Move)
+                {
+                    reachablePlayers.Add(p);
+                    break;
+                }
+            }
+        }
 
+        if(reachablePlayers.Count > 0)
+        {
+            if (reachablePlayers.Count == 1)
+                return Util.GRAPH.Vertices.Find(v => v.Tile == Util.TILES[reachablePlayers[0].GetComponent<Player>().posX,
+                                                                          reachablePlayers[0].GetComponent<Player>().posY]);
+            else
+            {
+                GameObject weakest = null;
+                foreach(GameObject p in reachablePlayers)
+                {
+                    if (weakest == null)
+                        weakest = p;
+                    else
+                    {
+                        //If they have same HP remaining, choose one having lower DEF (if physical class, otherwise RES)
+                        if (weakest.GetComponent<Player>().CHealth > p.GetComponent<Player>().CHealth)
+                            weakest = p;
+                        else if (weakest.GetComponent<Player>().CHealth == p.GetComponent<Player>().CHealth)
+                        {
+                            if(className == "Fighter")
+                                weakest = weakest.GetComponent<Player>().CDef <= p.GetComponent<Player>().CDef ? weakest : p;
+                            else if (className == "Mage")
+                                weakest = weakest.GetComponent<Player>().CRes <= p.GetComponent<Player>().CRes ? weakest : p;
+                        }
+                            
+                    }
+                }
+
+                return Util.GRAPH.Vertices.Find(v => v.Tile == Util.TILES[weakest.GetComponent<Player>().posX,
+                                                                          weakest.GetComponent<Player>().posY]);
+            }
+        }
 
         //If no players within enemy's reachable range, just 
         //go for the nearest one using Manhattan distance
@@ -71,36 +115,18 @@ public class Enemy : Character {
          * shortest path to make enemy move to that tile.
          */
 
-        Dijkstra(Util.GRAPH, Util.GRAPH.Vertices.Find(v => v.Tile.Equals(Util.TILES[posX, posY])));
-
         //Enemy cannot walk onto the player. it will choose
         //one adjacent tile that has least distance
         Tile destination = null;
         int desDist = 500;
-        if (!dest.isLeftBound)
-            if (desDist > dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == Util.TILES[dest.getX(), dest.getY()-1])])
+        foreach(Tile adj in dest.CharOnThis.GetComponent<Player>().adjacentTiles)
+        {
+            if(desDist > dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == adj)])
             {
-                desDist = dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == Util.TILES[dest.getX(), dest.getY() - 1])];                
-                destination = Util.TILES[dest.getX(), dest.getY() - 1];
+                desDist = dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == adj)];
+                destination = adj;
             }
-        if (!dest.isRightBound)
-            if (desDist > dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == Util.TILES[dest.getX(), dest.getY() + 1])])
-            {
-                desDist = dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == Util.TILES[dest.getX(), dest.getY() + 1])];
-                destination = Util.TILES[dest.getX(), dest.getY() + 1];
-            }
-        if (!dest.isDownBound)
-            if (desDist > dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == Util.TILES[dest.getX() - 1, dest.getY()])])
-            {
-                desDist = dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == Util.TILES[dest.getX() - 1, dest.getY()])];
-                destination = Util.TILES[dest.getX() - 1, dest.getY()];
-            }
-        if (!dest.isUpBound)
-            if (desDist > dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == Util.TILES[dest.getX() + 1, dest.getY()])])
-            {
-                desDist = dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile == Util.TILES[dest.getX() + 1, dest.getY()])];
-                destination = Util.TILES[dest.getX() + 1, dest.getY()];
-            }
+        }
 
         //Get distance from here to destination
         int count = dist[Util.GRAPH.Vertices.FindIndex(v => v.Tile.Equals(destination))];

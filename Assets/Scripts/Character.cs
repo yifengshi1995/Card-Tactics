@@ -14,11 +14,15 @@ public abstract class Character: MonoBehaviour {
     public int Resistence;
     public int Stamina;
     public int Move;
+    public string className;
 
     // Utilities 
     public int posX, posY;
     protected int[] dist;
     protected Vertex<Tile>[] prev;
+
+    [HideInInspector]
+    public List<Tile> adjacentTiles;
 
     /*
     public abstract void Move(int x, int y);
@@ -222,6 +226,34 @@ public abstract class Character: MonoBehaviour {
                     prev[graph.Vertices.IndexOf(vtemp)] = u;
                 }
             }
+        }
+    }
+
+    public void SetPosition()
+    {
+        if(adjacentTiles == null)
+        {
+            adjacentTiles = new List<Tile>();
+        }
+        else
+            adjacentTiles.Clear();
+
+        Util.TILES[posX, posY].SetChar(gameObject);
+        if(!Util.TILES[posX, posY].isLeftBound)
+        {
+            adjacentTiles.Add(Util.TILES[posX, posY - 1]);
+        }
+        if (!Util.TILES[posX, posY].isRightBound)
+        {
+            adjacentTiles.Add(Util.TILES[posX, posY + 1]);
+        }
+        if (!Util.TILES[posX, posY].isUpBound)
+        {
+            adjacentTiles.Add(Util.TILES[posX + 1, posY]);
+        }
+        if (!Util.TILES[posX, posY].isDownBound)
+        {
+            adjacentTiles.Add(Util.TILES[posX - 1, posY]);
         }
     }
 

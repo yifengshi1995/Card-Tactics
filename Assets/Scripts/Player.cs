@@ -12,8 +12,6 @@ public class Player : Character {
     private List<int> tempDeck;
     private bool canMove, canAct, finished;
 
-    public string className;
-
     public bool CanMove { get { return canMove; } }
     public bool CanAct { get { return canAct; } }
     public bool Finished { get { return finished; } }
@@ -44,8 +42,7 @@ public class Player : Character {
 	void Update() {
 
         StatusCalculation();
-
-        Util.TILES[posX, posY].SetChar(gameObject);
+        SetPosition();
 
         if (!finished)
         {
