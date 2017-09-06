@@ -42,7 +42,6 @@ public class GeneralMenuPointer : MonoBehaviour {
                     currentPlayer.GetComponent<Player>().FindMoveRange();
                     Util.STATE = Util.State.MOVE;
                     Util.GENERALMENU.SetActive(false);
-                    return;
                 }
 
                 if(index == 1 && currentPlayer.GetComponent<Player>().CanAct)
@@ -65,17 +64,20 @@ public class GeneralMenuPointer : MonoBehaviour {
                     Util.ACTIONMENU.GetComponent<ActionMenu>().SetCurrentPlayer(null);
                     Util.STATE = Util.State.AWAIT;        
                     Util.GENERALMENU.SetActive(false);
-                    return;
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.X) && (currentPlayer.GetComponent<Player>().CanAct || currentPlayer.GetComponent<Player>().CanMove))
+            if (Input.GetKeyDown(KeyCode.X) && currentPlayer.GetComponent<Player>().CanAct && !currentPlayer.GetComponent<Player>().CanMove)
             {
+                currentPlayer.GetComponent<Player>().CancelMove();
+            }
+            else if (Input.GetKeyDown(KeyCode.X) && currentPlayer.GetComponent<Player>().CanAct && currentPlayer.GetComponent<Player>().CanMove)
+            {
+                currentPlayer.GetComponent<Player>().ClearMoveRange();
                 Util.GENERALMENU.GetComponent<GeneralMenu>().SetCurrentPlayer(null);
                 Util.GM_POINTER.GetComponent<GeneralMenuPointer>().SetCurrentPlayer(null);
                 Util.ACTIONMENU.GetComponent<ActionMenu>().SetCurrentPlayer(null);
                 Util.STATE = Util.State.AWAIT;
-                return;
             }
         }  
 	}

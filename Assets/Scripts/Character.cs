@@ -20,6 +20,8 @@ public abstract class Character: MonoBehaviour {
     public int posX, posY;
     protected int[] dist;
     protected Vertex<Tile>[] prev;
+    protected int[] deck, hand;
+    protected List<int> tempDeck;
 
     [HideInInspector]
     public List<Tile> adjacentTiles;
@@ -274,5 +276,38 @@ public abstract class Character: MonoBehaviour {
             }
         }
             
+    }
+
+    public void Reload()
+    {
+        if (tempDeck[0] == 0)
+            Shuffle();
+
+        for (int i = 0; i < hand.Length; i++)
+        {
+            if (hand[i] == 0)
+            {
+                hand[i] = tempDeck[0];
+                tempDeck.RemoveAt(0);
+                tempDeck.Add(0);
+
+            }
+        }
+
+        Array.Sort(hand);
+    }
+
+    public void Shuffle()
+    {
+        System.Random rand = new System.Random();
+        for (int i = 0; i < deck.Length - 1; i++)
+        {
+            int j = rand.Next(i, deck.Length);
+            int temp = deck[i];
+            deck[i] = deck[j];
+            deck[j] = temp;
+        }
+
+        tempDeck = deck.ToList();
     }
 }

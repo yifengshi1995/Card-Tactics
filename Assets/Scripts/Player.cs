@@ -7,15 +7,13 @@ using UnityEngine.UI;
 public class Player : Character {
 
     private Transform cursor;
-    private List<GameObject> moveRange, actionRange;
-    private int[] deck, hand;
-    private List<int> tempDeck;
+    private List<GameObject> moveRange, actionRange; 
     private bool canMove, canAct, finished;
+    private Tile initialPos;
 
     public bool CanMove { get { return canMove; } }
     public bool CanAct { get { return canAct; } }
     public bool Finished { get { return finished; } }
-    //public List<GameObject> MoveRange { get { return moveRange; } }
     public int[] Dist { get { return dist; } }
     public Vertex<Tile>[] Prev { get { return prev; } }
     public int[] Hand { get { return hand; } }
@@ -67,22 +65,19 @@ public class Player : Character {
                         StartCoroutine(Moving(temp));
                     }
                 }
-
                 else if (Input.GetKeyDown(KeyCode.X))
                 {
-                    Debug.Log("Cancel Move");
-                    ClearMoveRange();
                     Util.STATE = Util.State.GENERALMENU;
+                    ClearMoveRange();
                     Util.GENERALMENU.SetActive(true);
                 }
-
             }
 
             else if (Util.STATE == Util.State.ATTACK && Util.GM_POINTER.GetComponent<GeneralMenuPointer>().CurrentPlayer.name == name)
             {
                 if (Input.GetKeyDown(KeyCode.Z))
                 {
-                    if(Util.CURSOR.GetComponent<Cursor>().CurrentTile().CharOnThis != null)
+                    if(Util.CURSOR.GetComponent<Cursor>().CurrentTile().CharOnThis != null && Util.CURSOR.GetComponent<Cursor>().CurrentTile().CharOnThis.tag == "Enemy")
                     {
                         Util.STATE = Util.State.BATTLEMENU;
                         GameObject enemy = Util.CURSOR.GetComponent<Cursor>().CurrentTile().CharOnThis;
@@ -202,14 +197,20 @@ public class Player : Character {
 
     public void ClearMoveRange()
     {
-        this.moveRange.ForEach(c => Destroy(c));
-        this.moveRange.Clear();
+        if(moveRange != null)
+        {
+            moveRange.ForEach(c => Destroy(c));
+            moveRange.Clear();
+        }    
     }
 
     public void ClearActionRange()
     {
-        this.actionRange.ForEach(c => Destroy(c));
-        this.actionRange.Clear();
+        if(actionRange != null)
+        {
+            actionRange.ForEach(c => Destroy(c));
+            actionRange.Clear();
+        }    
     }
 
     System.Collections.IEnumerator Moving(Tile dest)
@@ -222,6 +223,7 @@ public class Player : Character {
 
         //set canMove to false to prevent second move
         canMove = false;
+        initialPos = Util.TILES[posX, posY];
 
         //Get distance from here to destination
         int count = dist[Util.GRAPH.Vertices.FindIndex(v => ReferenceEquals(v.Tile, dest))];
@@ -274,9 +276,22 @@ public class Player : Character {
         posX = Mathf.Abs((int)(transform.position.x / 32 + transform.position.y / 16) / 2);
         posY = Mathf.Abs((int)(transform.position.y / 16 - transform.position.x / 32) / 2);
 
+
         //After moving back to general menu.
         Util.STATE = Util.State.GENERALMENU;
         Util.GENERALMENU.SetActive(true);
+    }
+
+    public void CancelMove()
+    {
+        canMove = true;
+        ClearMoveRange();
+        transform.position = initialPos.transform.position;
+        Util.CURSOR.transform.position = initialPos.transform.position;
+
+        Util.TILES[posX, posY].SetChar(null);
+        posX = Mathf.Abs((int)(transform.position.x / 32 + transform.position.y / 16) / 2);
+        posY = Mathf.Abs((int)(transform.position.y / 16 - transform.position.x / 32) / 2);
     }
 
     System.Collections.IEnumerator BattleHandling(GameObject target)
@@ -287,38 +302,5 @@ public class Player : Character {
         Util.BATTLEMENU.SetActive(false);
         finished = true;
         Util.STATE = Util.State.AWAIT;
-    }
-
-    void Reload()
-    {
-        if (tempDeck[0] == 0)
-            Shuffle();
-
-        for(int i = 0; i < hand.Length; i ++)
-        {
-            if(hand[i] == 0)
-            {
-                hand[i] = tempDeck[0];
-                tempDeck.RemoveAt(0);
-                tempDeck.Add(0);
-                
-            }
-        }
-
-        Array.Sort(hand);
-    }
-
-    void Shuffle()
-    {
-        System.Random rand = new System.Random();
-        for(int i = 0; i < deck.Length - 1; i++)
-        {
-            int j = rand.Next(i, deck.Length);
-            int temp = deck[i];
-            deck[i] = deck[j];
-            deck[j] = temp;
-        }
-
-        tempDeck = deck.ToList();
-    }
+    }  
 }

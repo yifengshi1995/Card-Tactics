@@ -68,9 +68,9 @@ public class Enemy : Character {
                             weakest = p;
                         else if (weakest.GetComponent<Player>().CHealth == p.GetComponent<Player>().CHealth)
                         {
-                            if(className == "Fighter")
+                            if(className.Equals("Fighter"))
                                 weakest = weakest.GetComponent<Player>().CDef <= p.GetComponent<Player>().CDef ? weakest : p;
-                            else if (className == "Mage")
+                            else if (className.Equals("Mage"))
                                 weakest = weakest.GetComponent<Player>().CRes <= p.GetComponent<Player>().CRes ? weakest : p;
                         }
                             
@@ -101,7 +101,21 @@ public class Enemy : Character {
 
     void SelectCards()
     {
+        if (className.Equals("Fighter"))
+        {
+            if((float)CHealth / Health >= 0.5)
+            {
 
+            }
+            else
+            {
+
+            }
+        }
+        else if (className.Equals("Mage"))
+        {
+
+        }
     }
 
     IEnumerator MakeMove(Tile dest)
