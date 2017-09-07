@@ -9,7 +9,11 @@ public class Enemy : Character {
     void Start()
     {
         RestoreDefaultStatus();
-        Guts = true;
+        
+        deck = new int[20] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 7, 7, 7 };
+        hand = new int[5] { 0, 0, 0, 0, 0 };
+        Shuffle();
+        Reload();
     }
 
     // Use this for initialization
