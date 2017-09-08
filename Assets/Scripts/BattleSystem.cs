@@ -7,6 +7,7 @@ public class BattleSystem : MonoBehaviour {
     private float turnBannerCounter;
     private List<GameObject> activePlayer;
     public List<GameObject> activeEnemy;
+    public bool lastEnemyFinished;
 
 	void Awake () {
         turnBannerCounter = 2f;
@@ -54,14 +55,10 @@ public class BattleSystem : MonoBehaviour {
         else if (activeEnemy.Count == 0 && Util.STATE == Util.State.ENEMY_ACTION)
             Util.STATE = Util.State.PLAYER_TURN_START;
 
-        if(Util.STATE == Util.State.ENEMY_ACTION)
+        if(Util.STATE == Util.State.ENEMY_ACTION && lastEnemyFinished)
         {
-            for(int i = 0; i < activeEnemy.Count; i++)
-            {
-                activeEnemy[i].GetComponent<Enemy>().Action();
-            }
-
-            activeEnemy.Clear();
+            activeEnemy[0].GetComponent<Enemy>().Action();
+            lastEnemyFinished = false;
         }
 
         if (Input.GetKeyDown(KeyCode.O))
@@ -92,6 +89,7 @@ public class BattleSystem : MonoBehaviour {
         Util.PLAYERS.ForEach(p =>
         {
             activePlayer.Add(p);
+            p.GetComponent<Player>().CanMove = true;
             p.GetComponent<Player>().StartOperation();
         });
     }
@@ -104,6 +102,7 @@ public class BattleSystem : MonoBehaviour {
             activeEnemy.Add(e);
             e.GetComponent<Enemy>().StartOperation();
         });
+        lastEnemyFinished = true;
     }
 
 

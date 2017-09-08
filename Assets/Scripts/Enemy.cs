@@ -214,11 +214,13 @@ public class Enemy : Character {
         posY = Mathf.Abs((int)(transform.position.y / 16 - transform.position.x / 32) / 2);
 
         FinishOperation();
+        Util.BATTLESYSTEM.GetComponent<BattleSystem>().lastEnemyFinished = true;
+        Util.BATTLESYSTEM.GetComponent<BattleSystem>().activeEnemy.RemoveAt(0);
     }
 
     public void Action()
     {
         Dijkstra(Util.GRAPH, Util.GRAPH.Vertices.Find(v => v.Tile.Equals(Util.TILES[posX, posY])));
-            StartCoroutine(MakeMove(SelectTarget().Tile));   
+        StartCoroutine(MakeMove(SelectTarget().Tile));    
     }
 }

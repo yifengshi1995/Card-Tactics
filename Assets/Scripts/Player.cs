@@ -11,7 +11,7 @@ public class Player : Character {
     private bool canMove, canAct;
     private Tile initialPos;
 
-    public bool CanMove { get { return canMove; } }
+    public bool CanMove { get { return canMove; } set { canMove = value; } }
     public bool CanAct { get { return canAct; } }
     public int[] Dist { get { return dist; } }
     public Vertex<Tile>[] Prev { get { return prev; } }
