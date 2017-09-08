@@ -18,6 +18,7 @@ public abstract class Character: MonoBehaviour {
 
     // Utilities 
     public int posX, posY;
+    protected bool finished;
     protected int[] dist;
     protected Vertex<Tile>[] prev;
     protected int[] deck, hand;
@@ -309,5 +310,26 @@ public abstract class Character: MonoBehaviour {
         }
 
         tempDeck = deck.ToList();
+    }
+
+    public void FinishOperation()
+    {
+        finished = true;
+        GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Characters/FinishTemp");
+        if (tag == "Player")
+            Util.BATTLESYSTEM.GetComponent<BattleSystem>().DeactivatePlayer(gameObject);
+    }
+
+    public void StartOperation()
+    {
+        finished = false;
+        if(tag == "Player")
+        {
+            GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Characters/Temp");
+        }
+        else if(tag == "Enemy")
+        {
+            GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Characters/EnemyTemp");
+        }
     }
 }

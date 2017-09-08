@@ -7,13 +7,12 @@ using UnityEngine.UI;
 public class Player : Character {
 
     private Transform cursor;
-    private List<GameObject> moveRange, actionRange; 
-    private bool canMove, canAct, finished;
+    private List<GameObject> moveRange, actionRange;
+    private bool canMove, canAct;
     private Tile initialPos;
 
     public bool CanMove { get { return canMove; } }
     public bool CanAct { get { return canAct; } }
-    public bool Finished { get { return finished; } }
     public int[] Dist { get { return dist; } }
     public Vertex<Tile>[] Prev { get { return prev; } }
     public int[] Hand { get { return hand; } }
@@ -122,8 +121,8 @@ public class Player : Character {
 
         if (Input.GetKeyDown(KeyCode.J))
         {
-            finished = false;
             canMove = true;
+            StartOperation();
         }
             
 	}
@@ -185,14 +184,6 @@ public class Player : Character {
 
         return list;
 
-    }
-
-    public void TurnEnd()
-    {
-        Util.TILES[posX, posY].SetChar(null);
-        posX = Mathf.Abs((int)(transform.position.x / 32 + transform.position.y / 16) / 2);
-        posY = Mathf.Abs((int)(transform.position.y / 16 - transform.position.x / 32) / 2);
-        finished = true;
     }
 
     public void ClearMoveRange()

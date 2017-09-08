@@ -30,8 +30,7 @@ public class Enemy : Character {
 
         if (Input.GetKeyDown(KeyCode.H))
         {
-            Dijkstra(Util.GRAPH, Util.GRAPH.Vertices.Find(v => v.Tile.Equals(Util.TILES[posX, posY])));
-            StartCoroutine(MakeMove(SelectTarget().Tile));
+            Action();
         }
     }
 
@@ -213,5 +212,13 @@ public class Enemy : Character {
         Util.TILES[posX, posY].SetChar(null);
         posX = Mathf.Abs((int)(transform.position.x / 32 + transform.position.y / 16) / 2);
         posY = Mathf.Abs((int)(transform.position.y / 16 - transform.position.x / 32) / 2);
+
+        FinishOperation();
+    }
+
+    public void Action()
+    {
+        Dijkstra(Util.GRAPH, Util.GRAPH.Vertices.Find(v => v.Tile.Equals(Util.TILES[posX, posY])));
+            StartCoroutine(MakeMove(SelectTarget().Tile));   
     }
 }

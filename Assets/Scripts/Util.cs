@@ -10,6 +10,7 @@ public class Util : MonoBehaviour {
     {
         START,
         SELECT_MENU,
+        PLAYER_TURN_START,
         AWAIT,
         GENERALMENU,
         MOVE,
@@ -18,6 +19,7 @@ public class Util : MonoBehaviour {
         CONFIRM_ACTION,
         ATTACK,
         BATTLEMENU,
+        ENEMY_TURN_START,
         ENEMY_ACTION,
         RESULT
     }
@@ -55,7 +57,6 @@ public class Util : MonoBehaviour {
 
     // Use this for initialization
     void Awake() {
-        STATE = State.AWAIT;
 
         GENERALMENU = GameObject.Find("Canvas").transform.Find("GeneralMenu").gameObject;
         GM_POINTER = GameObject.Find("Canvas").transform.Find("GeneralMenu").Find("Pointer").gameObject;
@@ -75,6 +76,9 @@ public class Util : MonoBehaviour {
             PLAYERS.AddRange(GameObject.FindGameObjectsWithTag("Player"));
         if(GameObject.FindGameObjectsWithTag("Enemy") != null)
             ENEMIES.AddRange(GameObject.FindGameObjectsWithTag("Enemy"));
+
+        STATE = State.PLAYER_TURN_START;
+        //BATTLESYSTEM.GetComponent<BattleSystem>().PlayerTurnStart();
     }
 	
 	// Update is called once per frame

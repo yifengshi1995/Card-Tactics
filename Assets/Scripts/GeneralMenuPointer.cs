@@ -58,7 +58,7 @@ public class GeneralMenuPointer : MonoBehaviour {
 
                 if (index == 3)
                 {
-                    currentPlayer.GetComponent<Player>().TurnEnd();
+                    currentPlayer.GetComponent<Player>().FinishOperation();
                     Util.GENERALMENU.GetComponent<GeneralMenu>().SetCurrentPlayer(null);
                     Util.GM_POINTER.GetComponent<GeneralMenuPointer>().SetCurrentPlayer(null);
                     Util.ACTIONMENU.GetComponent<ActionMenu>().SetCurrentPlayer(null);
